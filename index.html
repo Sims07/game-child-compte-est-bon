@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le compte est bon !</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chalkboard:#1F4B3F;
+    --chalkboard-dark:#153A2F;
+    --chalk:#F5F3E7;
+    --wood:#C08552;
+    --wood-dark:#8B5A2B;
+    --coral:#E85B4D;
+    --coral-dark:#C74536;
+    --yellow:#F4C95D;
+    --ink:#24312B;
+    --paper:#FBF3E3;
+    --die-green:#2F8F5B;
+    --die-green-dark:#22713F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(192,133,82,0.10) 0, transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(47,143,91,0.10) 0, transparent 45%);
+    font-family:'Quicksand', sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:20px 14px 48px;
+  }
+  .app{ width:100%; max-width:560px; }
+  header{ text-align:center; margin-bottom:18px; position:relative;}
+  h1{
+    font-family:'Patrick Hand', cursive;
+    font-size:2.6rem;
+    margin:0;
+    color:var(--chalkboard);
+    line-height:1;
+  }
+  header p{ margin:6px 0 0; font-weight:600; color:#5b6a5f; font-size:0.95rem;}
+  .score{
+    position:absolute; top:0; right:0;
+    background:var(--yellow);
+    border-radius:999px;
+    padding:6px 14px;
+    font-weight:700;
+    font-size:0.95rem;
+    box-shadow:0 3px 0 rgba(0,0,0,0.12);
+  }
+
+  .board{
+    background:var(--chalkboard);
+    border:10px solid var(--wood);
+    border-radius:18px;
+    padding:22px 20px 26px;
+    text-align:center;
+    box-shadow:0 8px 0 var(--wood-dark), 0 14px 24px rgba(0,0,0,0.18);
+    position:relative;
+    overflow:hidden;
+  }
+  .board::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size:6px 6px;
+    pointer-events:none;
+  }
+  .board .label{
+    font-family:'Patrick Hand', cursive;
+    color:var(--chalk);
+    font-size:1.15rem;
+    opacity:0.85;
+    letter-spacing:0.02em;
+  }
+  .target{
+    font-family:'Patrick Hand', cursive;
+    color:var(--chalk);
+    font-size:5rem;
+    line-height:1;
+    margin:4px 0 2px;
+    text-shadow:0 0 14px rgba(245,243,231,0.25);
+    transition:transform 0.25s ease;
+  }
+  .target.pop{ transform:scale(1.15); }
+
+  .feedback{
+    min-height:1.4em;
+    font-weight:700;
+    font-size:1.05rem;
+    margin-top:8px;
+    color:var(--chalk);
+  }
+
+  .tray{
+    background:var(--wood);
+    border-radius:18px;
+    padding:18px 16px;
+    margin-top:16px;
+    box-shadow:0 6px 0 var(--wood-dark);
+  }
+  .dice-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .die{
+    width:56px; height:56px;
+    background:var(--die-green);
+    border-radius:12px;
+    box-shadow:0 4px 0 var(--die-green-dark);
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+    padding:8px;
+  }
+  .die .dot{ width:9px; height:9px; border-radius:50%; margin:auto; background:transparent; }
+  .die .dot.on{ background:var(--chalk); }
+
+  .tiles-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:16px;
+    min-height:64px;
+  }
+  .tile{
+    width:64px; height:64px;
+    background:var(--chalk);
+    border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Patrick Hand', cursive;
+    font-size:1.8rem;
+    color:var(--ink);
+    cursor:pointer;
+    border:3px solid transparent;
+    box-shadow:0 4px 0 rgba(0,0,0,0.15);
+    transition:transform 0.15s ease, border-color 0.15s ease;
+    user-select:none;
+  }
+  .tile:hover{ transform:translateY(-2px); }
+  .tile.selected{ border-color:var(--coral); background:#fff; }
+  .tile .history{
+    position:absolute;
+    margin-top:44px;
+    font-size:0.6rem;
+    font-family:'Quicksand',sans-serif;
+    color:#7a6a58;
+    font-weight:600;
+  }
+  .tile-wrap{ display:flex; flex-direction:column; align-items:center; position:relative;}
+
+  .ops-row{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:18px;
+  }
+  .op-btn{
+    width:52px; height:52px;
+    border-radius:50%;
+    border:none;
+    background:var(--chalkboard);
+    color:var(--chalk);
+    font-size:1.5rem;
+    font-family:'Patrick Hand', cursive;
+    cursor:pointer;
+    box-shadow:0 4px 0 var(--chalkboard-dark);
+  }
+  .op-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .op-btn:active:not(:disabled){ transform:translateY(3px); box-shadow:none; }
+
+  .actions{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-top:20px;
+    flex-wrap:wrap;
+  }
+  button.main-btn{
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:1rem;
+    padding:12px 22px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    box-shadow:0 4px 0 rgba(0,0,0,0.18);
+  }
+  button.main-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .btn-roll{ background:var(--coral); color:white; }
+  .btn-validate{ background:var(--yellow); color:var(--ink); }
+  .btn-hint{ background:transparent; color:var(--chalkboard); border:2px solid var(--chalkboard); box-shadow:none; padding:10px 20px;}
+  .btn-hint:active{ transform:none; }
+  .btn-next{ background:var(--chalkboard); color:var(--chalk); }
+  button:disabled{ opacity:0.4; cursor:not-allowed; }
+
+  .solution-box{
+    margin-top:14px;
+    background:#fff;
+    border:2px dashed var(--wood);
+    border-radius:12px;
+    padding:10px 14px;
+    font-weight:600;
+    font-size:0.95rem;
+    text-align:center;
+    display:none;
+  }
+  .solution-box.show{ display:block; }
+
+  footer{
+    text-align:center;
+    margin-top:20px;
+    font-size:0.8rem;
+    color:#8a8a80;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Le compte est bon !</h1>
+    <p>Additions, soustractions et multiplications — niveau CE2</p>
+    <div class="score">⭐ <span id="score">0</span></div>
+  </header>
+
+  <div class="board">
+    <div class="label">Nombre à trouver</div>
+    <div class="target" id="target">--</div>
+    <div class="feedback" id="feedback" aria-live="polite"></div>
+  </div>
+
+  <div class="tray">
+    <div class="dice-row" id="diceRow"></div>
+    <div class="tiles-row" id="tilesRow"></div>
+    <div class="ops-row">
+      <button class="op-btn" id="opAdd" disabled>+</button>
+      <button class="op-btn" id="opSub" disabled>−</button>
+      <button class="op-btn" id="opMul" disabled>×</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="main-btn btn-roll" id="rollBtn">🎲 Lancer les dés</button>
+    <button class="main-btn btn-validate" id="validateBtn" disabled>Valider mon nombre</button>
+    <button class="main-btn btn-hint" id="hintBtn" disabled>Voir une solution</button>
+    <button class="main-btn btn-next" id="nextBtn" style="display:none;">Manche suivante ▶</button>
+  </div>
+
+  <div class="solution-box" id="solutionBox"></div>
+
+  <footer>Choisis deux nombres, combine-les avec + − ou ×, jusqu'à retrouver le nombre à trouver.</footer>
+</div>
+
+<script>
+(function(){
+  const dieRow = document.getElementById('diceRow');
+  const tilesRow = document.getElementById('tilesRow');
+  const targetEl = document.getElementById('target');
+  const feedbackEl = document.getElementById('feedback');
+  const scoreEl = document.getElementById('score');
+  const rollBtn = document.getElementById('rollBtn');
+  const validateBtn = document.getElementById('validateBtn');
+  const hintBtn = document.getElementById('hintBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const solutionBox = document.getElementById('solutionBox');
+  const opAdd = document.getElementById('opAdd');
+  const opSub = document.getElementById('opSub');
+  const opMul = document.getElementById('opMul');
+
+  const DIE_PATTERNS = {
+    1:[4], 2:[0,8], 3:[0,4,8], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8]
+  };
+
+  let pool = [];      // {id, value}
+  let selected = [];  // ids
+  let target = null;
+  let solutionText = "";
+  let score = 0;
+  let uidCounter = 0;
+  let roundLocked = true; // true until dice are rolled
+
+  function uid(){ return 'n' + (uidCounter++); }
+
+  function renderDie(container, value){
+    container.innerHTML = '';
+    for(let i=0;i<9;i++){
+      const d = document.createElement('div');
+      d.className = 'dot' + (DIE_PATTERNS[value].includes(i) ? ' on' : '');
+      container.appendChild(d);
+    }
+  }
+
+  function rollDiceAnimation(finalValues, done){
+    dieRow.innerHTML = '';
+    const dieEls = finalValues.map(()=> {
+      const die = document.createElement('div');
+      die.className = 'die';
+      dieRow.appendChild(die);
+      return die;
+    });
+    let ticks = 0;
+    const maxTicks = 10;
+    const interval = setInterval(()=>{
+      dieEls.forEach(el => renderDie(el, 1 + Math.floor(Math.random()*6)));
+      ticks++;
+      if(ticks >= maxTicks){
+        clearInterval(interval);
+        dieEls.forEach((el, i) => renderDie(el, finalValues[i]));
+        done();
+      }
+    }, 60);
+  }
+
+  function randInt(min,max){ return min + Math.floor(Math.random()*(max-min+1)); }
+
+  function attemptTarget(diceValues){
+    for(let attempt=0; attempt<400; attempt++){
+      const useThree = Math.random() < 0.4;
+      const idx = [...diceValues.keys()];
+      // shuffle
+      for(let i=idx.length-1;i>0;i--){ const j=randInt(0,i); [idx[i],idx[j]]=[idx[j],idx[i]]; }
+      const chosen = useThree ? idx.slice(0,3) : idx.slice(0,2);
+      const vals = chosen.map(i=>diceValues[i]);
+
+      const step = (a,b) => {
+        const ops = ['+','+','-','×'];
+        const op = ops[randInt(0,ops.length-1)];
+        if(op==='×' && (a===1 || b===1)) return null;
+        if(op==='-' && a===b) return null;
+        let res, label;
+        if(op==='+'){ res=a+b; label=`${a} + ${b} = ${res}`; }
+        else if(op==='-'){ res=Math.abs(a-b); label=`${Math.max(a,b)} − ${Math.min(a,b)} = ${res}`; }
+        else { res=a*b; label=`${a} × ${b} = ${res}`; }
+        return {res, label};
+      };
+
+      let r1 = step(vals[0], vals[1]);
+      if(!r1) continue;
+      let finalRes = r1.res;
+      let lines = [r1.label];
+
+      if(useThree){
+        let r2 = step(r1.res, vals[2]);
+        if(!r2) continue;
+        finalRes = r2.res;
+        lines.push(r2.label);
+      }
+
+      if(finalRes >= 10 && finalRes <= 90){
+        return { target: finalRes, solution: lines.join('\n') };
+      }
+    }
+    return null; // aucun nombre valide (>=10) trouvé avec ces dés
+  }
+
+  function generateTarget(diceValues){
+    return attemptTarget(diceValues);
+  }
+
+  function newRound(){
+    feedbackEl.textContent = '';
+    solutionBox.classList.remove('show');
+    solutionBox.textContent = '';
+    nextBtn.style.display = 'none';
+    validateBtn.disabled = true;
+    hintBtn.disabled = true;
+    roundLocked = true;
+    rollBtn.disabled = true;
+    targetEl.textContent = '?';
+    tilesRow.innerHTML = '';
+    selected = [];
+    pool = [];
+    updateOpButtons();
+
+    let diceValues = Array.from({length:5}, () => randInt(1,6));
+    let gen = generateTarget(diceValues);
+    let safety = 0;
+    while(!gen && safety < 50){
+      diceValues = Array.from({length:5}, () => randInt(1,6));
+      gen = generateTarget(diceValues);
+      safety++;
+    }
+
+    rollDiceAnimation(diceValues, () => {
+      pool = diceValues.map(v => ({ id: uid(), value: v }));
+      target = gen.target;
+      solutionText = gen.solution;
+      targetEl.textContent = target;
+      targetEl.classList.add('pop');
+      setTimeout(()=>targetEl.classList.remove('pop'), 250);
+      roundLocked = false;
+      rollBtn.disabled = false;
+      hintBtn.disabled = false;
+      renderTiles();
+    });
+  }
+
+  function renderTiles(){
+    tilesRow.innerHTML = '';
+    pool.forEach(tile => {
+      const wrap = document.createElement('div');
+      wrap.className = 'tile-wrap';
+      const el = document.createElement('div');
+      el.className = 'tile' + (selected.includes(tile.id) ? ' selected' : '');
+      el.textContent = tile.value;
+      el.addEventListener('click', () => toggleSelect(tile.id));
+      wrap.appendChild(el);
+      if(tile.history){
+        const h = document.createElement('div');
+        h.className = 'history';
+        h.textContent = tile.history;
+        wrap.appendChild(h);
+      }
+      tilesRow.appendChild(wrap);
+    });
+    updateOpButtons();
+  }
+
+  function toggleSelect(id){
+    if(roundLocked) return;
+    if(selected.includes(id)){
+      selected = selected.filter(x => x !== id);
+    } else {
+      if(selected.length >= 2) selected.shift();
+      selected.push(id);
+    }
+    renderTiles();
+  }
+
+  function updateOpButtons(){
+    const twoSelected = selected.length === 2;
+    opAdd.disabled = !twoSelected;
+    opSub.disabled = !twoSelected;
+    opMul.disabled = !twoSelected;
+    validateBtn.disabled = selected.length !== 1;
+  }
+
+  function combine(op){
+    if(selected.length !== 2) return;
+    const a = pool.find(t => t.id === selected[0]);
+    const b = pool.find(t => t.id === selected[1]);
+    if(!a || !b) return;
+    let value, historyLabel;
+    if(op === '+'){ value = a.value + b.value; historyLabel = `${a.value}+${b.value}`; }
+    else if(op === '-'){
+      value = Math.abs(a.value - b.value);
+      if(value === 0){
+        feedbackEl.textContent = "Ces deux nombres sont égaux, essaie une autre combinaison !";
+        return;
+      }
+      historyLabel = `${Math.max(a.value,b.value)}-${Math.min(a.value,b.value)}`;
+    } else {
+      value = a.value * b.value;
+      historyLabel = `${a.value}×${b.value}`;
+    }
+    pool = pool.filter(t => t.id !== a.id && t.id !== b.id);
+    pool.push({ id: uid(), value, history: historyLabel });
+    selected = [];
+    feedbackEl.textContent = '';
+    renderTiles();
+  }
+
+  function validate(){
+    if(selected.length !== 1) return;
+    const tile = pool.find(t => t.id === selected[0]);
+    if(!tile) return;
+    const diff = Math.abs(tile.value - target);
+    if(diff === 0){
+      score++;
+      scoreEl.textContent = score;
+      feedbackEl.textContent = "🎉 Bravo, c'est exactement ça !";
+      roundLocked = true;
+      validateBtn.disabled = true;
+      nextBtn.style.display = 'inline-block';
+    } else if(diff <= 3){
+      feedbackEl.textContent = `👍 Presque ! Tu es à ${diff} près.`;
+    } else {
+      feedbackEl.textContent = "😕 Pas encore, essaie une autre combinaison.";
+    }
+  }
+
+  function showHint(){
+    solutionBox.textContent = "Une solution possible :\n" + solutionText;
+    solutionBox.style.whiteSpace = 'pre-line';
+    solutionBox.classList.add('show');
+  }
+
+  opAdd.addEventListener('click', () => combine('+'));
+  opSub.addEventListener('click', () => combine('-'));
+  opMul.addEventListener('click', () => combine('×'));
+  validateBtn.addEventListener('click', validate);
+  hintBtn.addEventListener('click', showHint);
+  rollBtn.addEventListener('click', newRound);
+  nextBtn.addEventListener('click', newRound);
+
+  newRound();
+})();
+</script>
+</body>
+</html>
