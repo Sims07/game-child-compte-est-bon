@@ -23,6 +23,15 @@ Aucune installation : ouvrir le fichier `compte-est-bon.html` dans n'importe que
 
 ## 📝 Changelog
 
+### v1.7.0
+- Amélioration de la lisibilité des dés : dés et points agrandis, bordure contrastée autour de chaque dé, et en thème Poudlard un fond bordeaux foncé avec points dorés (au lieu de points clairs sur fond doré, peu lisibles).
+
+### v1.6.0
+- Ajout de décorations visuelles dans le thème Poudlard : chapeau de sorcier, vif d'or animé, baguette magique et balai (illustrations originales en SVG, sans logo officiel).
+
+### v1.5.0
+- Ajout d'un bouton **🪄 Thème Poudlard** permettant de basculer vers un habillage visuel inspiré de l'univers Gryffondor (couleurs rouge et or, typographie plus "magique", textes adaptés). Le thème classique reste disponible en un clic.
+
 ### v1.4.0
 - Ajout d'un bouton ↩️ **Annuler** permettant de revenir sur la dernière opération effectuée.
 

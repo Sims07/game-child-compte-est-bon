@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le compte est bon !</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@500;600;700&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
 <style>
   :root{
     --chalkboard:#1F4B3F;
@@ -20,6 +20,61 @@
     --paper:#FBF3E3;
     --die-green:#2F8F5B;
     --die-green-dark:#22713F;
+  }
+  body.theme-hp{
+    --chalkboard:#740001;
+    --chalkboard-dark:#4d0000;
+    --chalk:#EFE1B3;
+    --wood:#D3A625;
+    --wood-dark:#946B00;
+    --coral:#AE0001;
+    --coral-dark:#740001;
+    --yellow:#EEBA30;
+    --ink:#2B1600;
+    --paper:#F1E3C2;
+    --die-green:#D3A625;
+    --die-green-dark:#946B00;
+  }
+  body.theme-hp h1{ font-family:'Cinzel Decorative', 'Patrick Hand', cursive; font-size:2.1rem; }
+  body.theme-hp .target{ font-family:'Cinzel Decorative', 'Patrick Hand', cursive; font-size:3.6rem; }
+  body.theme-hp .board{ border-color:var(--wood); }
+  .theme-toggle-btn{
+    display:block;
+    margin:10px auto 0;
+    background:transparent;
+    border:2px solid var(--chalkboard);
+    color:var(--chalkboard);
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size:0.85rem;
+    padding:6px 16px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  body.theme-hp .theme-toggle-btn{ border-color:var(--wood); color:var(--wood-dark); }
+
+  .hp-decor{ display:none; }
+  body.theme-hp .hp-decor{ display:flex; }
+  .hp-decor-top{
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    margin-bottom:6px;
+  }
+  .hp-decor-divider{
+    justify-content:center;
+    align-items:center;
+    gap:24px;
+    margin:14px 0 4px;
+  }
+  .hp-icon{ width:42px; height:42px; }
+  .hp-hat{ transform:rotate(-6deg); }
+  .hp-snitch{ animation:hp-flutter 2.4s ease-in-out infinite; }
+  .hp-wand{ transform:rotate(-8deg); }
+  .hp-broom{ transform:rotate(8deg); }
+  @keyframes hp-flutter{
+    0%,100%{ transform:translateY(0) rotate(-4deg); }
+    50%{ transform:translateY(-6px) rotate(4deg); }
   }
   *{box-sizing:border-box;}
   body{
@@ -108,21 +163,24 @@
   .dice-row{
     display:flex;
     justify-content:center;
-    gap:10px;
+    gap:14px;
     flex-wrap:wrap;
   }
   .die{
-    width:56px; height:56px;
+    width:70px; height:70px;
     background:var(--die-green);
-    border-radius:12px;
-    box-shadow:0 4px 0 var(--die-green-dark);
+    border:3px solid var(--die-green-dark);
+    border-radius:14px;
+    box-shadow:0 4px 0 var(--die-green-dark), 0 6px 10px rgba(0,0,0,0.18);
     display:grid;
     grid-template-columns:repeat(3,1fr);
     grid-template-rows:repeat(3,1fr);
-    padding:8px;
+    padding:10px;
   }
-  .die .dot{ width:9px; height:9px; border-radius:50%; margin:auto; background:transparent; }
-  .die .dot.on{ background:var(--chalk); }
+  .die .dot{ width:12px; height:12px; border-radius:50%; margin:auto; background:transparent; }
+  .die .dot.on{ background:var(--chalk); box-shadow:0 1px 1px rgba(0,0,0,0.2) inset; }
+  body.theme-hp .die{ background:#3A0000; border-color:var(--yellow); box-shadow:0 4px 0 #220000, 0 6px 10px rgba(0,0,0,0.25); }
+  body.theme-hp .die .dot.on{ background:var(--yellow); box-shadow:none; }
 
   .tiles-row{
     display:flex;
@@ -233,13 +291,43 @@
 <body>
 <div class="app">
   <header>
-    <h1>Le compte est bon !</h1>
-    <p>Additions, soustractions et multiplications — niveau CE2</p>
-    <div class="score">⭐ <span id="score">0</span></div>
+    <div class="hp-decor hp-decor-top">
+      <svg class="hp-icon hp-hat" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <path d="M32 4 L48 44 L16 44 Z" fill="var(--chalkboard)" stroke="var(--wood)" stroke-width="2"/>
+        <rect x="8" y="44" width="48" height="8" rx="4" fill="var(--chalkboard)" stroke="var(--wood)" stroke-width="2"/>
+        <rect x="18" y="32" width="28" height="6" fill="var(--wood)"/>
+        <path d="M32 10 L34 15 L39 16 L34 17 L32 22 L30 17 L25 16 L30 15 Z" fill="var(--yellow)"/>
+      </svg>
+      <svg class="hp-icon hp-snitch" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="16" cy="32" rx="15" ry="8" fill="var(--chalk)" opacity="0.9"/>
+        <ellipse cx="48" cy="32" rx="15" ry="8" fill="var(--chalk)" opacity="0.9"/>
+        <circle cx="32" cy="32" r="11" fill="var(--yellow)" stroke="var(--wood-dark)" stroke-width="2"/>
+      </svg>
+    </div>
+    <h1 id="gameTitle">Le compte est bon !</h1>
+    <p id="gameSubtitle">Additions, soustractions et multiplications — niveau CE2</p>
+    <div class="score"><span id="scoreIcon">⭐</span> <span id="score">0</span></div>
+    <button class="theme-toggle-btn" id="themeToggle">🪄 Thème Poudlard</button>
   </header>
 
+  <div class="hp-decor hp-decor-divider">
+    <svg class="hp-icon hp-wand" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <line x1="8" y1="58" x2="46" y2="14" stroke="#7a4a25" stroke-width="5" stroke-linecap="round"/>
+      <path d="M52 4 L54.5 10.5 L61 13 L54.5 15.5 L52 22 L49.5 15.5 L43 13 L49.5 10.5 Z" fill="var(--yellow)"/>
+    </svg>
+    <svg class="hp-icon hp-broom" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <line x1="18" y1="58" x2="48" y2="10" stroke="#7a4a25" stroke-width="5" stroke-linecap="round"/>
+      <g stroke="#c9a227" stroke-width="2.5" stroke-linecap="round">
+        <line x1="4" y1="60" x2="19" y2="42"/>
+        <line x1="8" y1="63" x2="21" y2="44"/>
+        <line x1="2" y1="54" x2="17" y2="39"/>
+        <line x1="0" y1="48" x2="15" y2="36"/>
+      </g>
+    </svg>
+  </div>
+
   <div class="board">
-    <div class="label">Nombre à trouver</div>
+    <div class="label" id="targetLabel">Nombre à trouver</div>
     <div class="target" id="target">--</div>
     <div class="feedback" id="feedback" aria-live="polite"></div>
   </div>
@@ -264,7 +352,7 @@
 
   <div class="solution-box" id="solutionBox"></div>
 
-  <footer>Choisis un nombre, une opération (+ − ×), puis un second nombre pour calculer — comme sur une calculette — jusqu'à retrouver le nombre à trouver.</footer>
+  <footer id="footerText">Choisis un nombre, une opération (+ − ×), puis un second nombre pour calculer — comme sur une calculette — jusqu'à retrouver le nombre à trouver.</footer>
 </div>
 
 <script>
@@ -283,6 +371,12 @@
   const opSub = document.getElementById('opSub');
   const opMul = document.getElementById('opMul');
   const undoBtn = document.getElementById('undoBtn');
+  const themeToggle = document.getElementById('themeToggle');
+  const gameTitle = document.getElementById('gameTitle');
+  const gameSubtitle = document.getElementById('gameSubtitle');
+  const targetLabel = document.getElementById('targetLabel');
+  const scoreIcon = document.getElementById('scoreIcon');
+  const footerText = document.getElementById('footerText');
 
   const DIE_PATTERNS = {
     1:[4], 2:[0,8], 3:[0,4,8], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8]
@@ -534,6 +628,42 @@
     solutionBox.style.whiteSpace = 'pre-line';
     solutionBox.classList.add('show');
   }
+
+  const THEMES = {
+    classic: {
+      title: 'Le compte est bon !',
+      subtitle: 'Additions, soustractions et multiplications — niveau CE2',
+      targetLabel: 'Nombre à trouver',
+      scoreIcon: '⭐',
+      toggleLabel: '🪄 Thème Poudlard',
+      footer: "Choisis un nombre, une opération (+ − ×), puis un second nombre pour calculer — comme sur une calculette — jusqu'à retrouver le nombre à trouver."
+    },
+    hp: {
+      title: 'Le compte est bon ⚡ édition Poudlard',
+      subtitle: 'Un sortilège de calcul pour Gryffondor — niveau CE2',
+      targetLabel: 'Nombre magique à trouver',
+      scoreIcon: '🦁',
+      toggleLabel: '📜 Thème classique',
+      footer: "Choisis un nombre, un sortilège (+ − ×), puis un second nombre pour lancer ton calcul — jusqu'à trouver le nombre magique !"
+    }
+  };
+  let currentTheme = 'classic';
+
+  function applyTheme(name){
+    currentTheme = name;
+    document.body.classList.toggle('theme-hp', name === 'hp');
+    const t = THEMES[name];
+    gameTitle.textContent = t.title;
+    gameSubtitle.textContent = t.subtitle;
+    targetLabel.textContent = t.targetLabel;
+    scoreIcon.textContent = t.scoreIcon;
+    themeToggle.textContent = t.toggleLabel;
+    footerText.textContent = t.footer;
+  }
+
+  themeToggle.addEventListener('click', () => {
+    applyTheme(currentTheme === 'classic' ? 'hp' : 'classic');
+  });
 
   opAdd.addEventListener('click', () => chooseOp('+'));
   opSub.addEventListener('click', () => chooseOp('-'));
