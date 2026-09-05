@@ -6,7 +6,7 @@ Un petit jeu de calcul mental inspiré du **compte est bon**, pensé pour un niv
 
 1. On lance **5 dés verts** (valeurs de 1 à 6).
 2. Un algorithme calcule un **nombre à trouver** (toujours entre 10 et 90), obtenu en combinant certains des nombres tirés avec des additions, soustractions ou multiplications adaptées au niveau CE2.
-3. Le joueur sélectionne deux nombres, puis une opération (**+ − ×**) pour les combiner. La soustraction est toujours calculée du plus grand vers le plus petit (jamais de résultat négatif).
+3. Le joueur choisit un nombre, puis une opération (**+ − ×**), puis un second nombre — comme sur une calculette — et le calcul se fait aussitôt. La soustraction est toujours calculée du plus grand vers le plus petit (jamais de résultat négatif).
 4. Il recommence jusqu'à obtenir une valeur qui correspond au nombre à trouver, puis clique sur **Valider mon nombre**.
 5. Un bouton **Voir une solution** permet d'afficher un exemple de calcul en cas de blocage.
 6. Chaque compte exact rapporte une ⭐.
@@ -22,6 +22,12 @@ Aucune installation : ouvrir le fichier `compte-est-bon.html` dans n'importe que
 - Compatible ordinateur, tablette et mobile
 
 ## 📝 Changelog
+
+### v1.4.0
+- Ajout d'un bouton ↩️ **Annuler** permettant de revenir sur la dernière opération effectuée.
+
+### v1.3.0
+- Nouveau mode de saisie façon calculette : on choisit d'abord un nombre, puis une opération (+ − ×), puis le second nombre, et le calcul se fait automatiquement (au lieu de sélectionner les deux nombres avant l'opération).
 
 ### v1.2.0
 - Correction définitive : si aucun nombre ≥ 10 n'est atteignable avec les dés tirés, les dés sont relancés automatiquement jusqu'à obtenir un tirage valide (suppression de l'ancien secours qui pouvait produire un nombre trop faible, ex. 3 × 3 = 9).

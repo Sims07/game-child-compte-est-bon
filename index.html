@@ -177,6 +177,8 @@
   }
   .op-btn:disabled{ opacity:0.35; cursor:not-allowed; }
   .op-btn:active:not(:disabled){ transform:translateY(3px); box-shadow:none; }
+  .op-btn.active{ background:var(--coral); box-shadow:0 4px 0 var(--coral-dark); transform:translateY(2px); }
+  #undoBtn{ background:var(--wood); box-shadow:0 4px 0 var(--wood-dark); font-size:1.2rem; }
 
   .actions{
     display:flex;
@@ -249,6 +251,7 @@
       <button class="op-btn" id="opAdd" disabled>+</button>
       <button class="op-btn" id="opSub" disabled>−</button>
       <button class="op-btn" id="opMul" disabled>×</button>
+      <button class="op-btn" id="undoBtn" title="Annuler la dernière opération" disabled>↩️</button>
     </div>
   </div>
 
@@ -261,7 +264,7 @@
 
   <div class="solution-box" id="solutionBox"></div>
 
-  <footer>Choisis deux nombres, combine-les avec + − ou ×, jusqu'à retrouver le nombre à trouver.</footer>
+  <footer>Choisis un nombre, une opération (+ − ×), puis un second nombre pour calculer — comme sur une calculette — jusqu'à retrouver le nombre à trouver.</footer>
 </div>
 
 <script>
@@ -279,13 +282,16 @@
   const opAdd = document.getElementById('opAdd');
   const opSub = document.getElementById('opSub');
   const opMul = document.getElementById('opMul');
+  const undoBtn = document.getElementById('undoBtn');
 
   const DIE_PATTERNS = {
     1:[4], 2:[0,8], 3:[0,4,8], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8]
   };
 
   let pool = [];      // {id, value}
-  let selected = [];  // ids
+  let history = [];   // snapshots du pool avant chaque opération, pour l'annulation
+  let primary = null; // id du premier nombre sélectionné
+  let pendingOp = null; // '+', '-', '×' ou null
   let target = null;
   let solutionText = "";
   let score = 0;
@@ -381,8 +387,10 @@
     rollBtn.disabled = true;
     targetEl.textContent = '?';
     tilesRow.innerHTML = '';
-    selected = [];
+    primary = null;
+    pendingOp = null;
     pool = [];
+    history = [];
     updateOpButtons();
 
     let diceValues = Array.from({length:5}, () => randInt(1,6));
@@ -414,9 +422,9 @@
       const wrap = document.createElement('div');
       wrap.className = 'tile-wrap';
       const el = document.createElement('div');
-      el.className = 'tile' + (selected.includes(tile.id) ? ' selected' : '');
+      el.className = 'tile' + (tile.id === primary ? ' selected' : '');
       el.textContent = tile.value;
-      el.addEventListener('click', () => toggleSelect(tile.id));
+      el.addEventListener('click', () => selectTile(tile.id));
       wrap.appendChild(el);
       if(tile.history){
         const h = document.createElement('div');
@@ -429,53 +437,82 @@
     updateOpButtons();
   }
 
-  function toggleSelect(id){
+  function selectTile(id){
     if(roundLocked) return;
-    if(selected.includes(id)){
-      selected = selected.filter(x => x !== id);
+    if(primary === null){
+      // premier nombre du calcul
+      primary = id;
+    } else if(id === primary && !pendingOp){
+      // on reclique sur le même nombre sans opération choisie -> on désélectionne
+      primary = null;
+    } else if(pendingOp){
+      if(id === primary){
+        // reclique sur le nombre de départ pendant qu'une opération est en attente -> annule l'opération
+        pendingOp = null;
+      } else {
+        // deuxième nombre choisi -> on calcule tout de suite, comme sur une calculette
+        const success = doCombine(pendingOp, primary, id);
+        if(success){ primary = null; pendingOp = null; }
+      }
     } else {
-      if(selected.length >= 2) selected.shift();
-      selected.push(id);
+      // aucune opération choisie -> on change simplement le nombre de départ
+      primary = id;
     }
     renderTiles();
   }
 
-  function updateOpButtons(){
-    const twoSelected = selected.length === 2;
-    opAdd.disabled = !twoSelected;
-    opSub.disabled = !twoSelected;
-    opMul.disabled = !twoSelected;
-    validateBtn.disabled = selected.length !== 1;
+  function chooseOp(op){
+    if(roundLocked || primary === null) return;
+    pendingOp = (pendingOp === op) ? null : op;
+    renderTiles();
   }
 
-  function combine(op){
-    if(selected.length !== 2) return;
-    const a = pool.find(t => t.id === selected[0]);
-    const b = pool.find(t => t.id === selected[1]);
-    if(!a || !b) return;
+  function updateOpButtons(){
+    const canOperate = primary !== null;
+    [opAdd, opSub, opMul].forEach(btn => btn.disabled = !canOperate);
+    opAdd.classList.toggle('active', pendingOp === '+');
+    opSub.classList.toggle('active', pendingOp === '-');
+    opMul.classList.toggle('active', pendingOp === '×');
+    validateBtn.disabled = !(primary !== null && !pendingOp);
+    undoBtn.disabled = roundLocked || history.length === 0;
+  }
+
+  function doCombine(op, aId, bId){
+    const a = pool.find(t => t.id === aId);
+    const b = pool.find(t => t.id === bId);
+    if(!a || !b) return false;
     let value, historyLabel;
     if(op === '+'){ value = a.value + b.value; historyLabel = `${a.value}+${b.value}`; }
     else if(op === '-'){
       value = Math.abs(a.value - b.value);
       if(value === 0){
         feedbackEl.textContent = "Ces deux nombres sont égaux, essaie une autre combinaison !";
-        return;
+        return false;
       }
       historyLabel = `${Math.max(a.value,b.value)}-${Math.min(a.value,b.value)}`;
     } else {
       value = a.value * b.value;
       historyLabel = `${a.value}×${b.value}`;
     }
+    history.push(pool.map(t => ({...t})));
     pool = pool.filter(t => t.id !== a.id && t.id !== b.id);
     pool.push({ id: uid(), value, history: historyLabel });
-    selected = [];
+    feedbackEl.textContent = '';
+    return true;
+  }
+
+  function undo(){
+    if(roundLocked || history.length === 0) return;
+    pool = history.pop();
+    primary = null;
+    pendingOp = null;
     feedbackEl.textContent = '';
     renderTiles();
   }
 
   function validate(){
-    if(selected.length !== 1) return;
-    const tile = pool.find(t => t.id === selected[0]);
+    if(!(primary !== null && !pendingOp)) return;
+    const tile = pool.find(t => t.id === primary);
     if(!tile) return;
     const diff = Math.abs(tile.value - target);
     if(diff === 0){
@@ -498,9 +535,10 @@
     solutionBox.classList.add('show');
   }
 
-  opAdd.addEventListener('click', () => combine('+'));
-  opSub.addEventListener('click', () => combine('-'));
-  opMul.addEventListener('click', () => combine('×'));
+  opAdd.addEventListener('click', () => chooseOp('+'));
+  opSub.addEventListener('click', () => chooseOp('-'));
+  opMul.addEventListener('click', () => chooseOp('×'));
+  undoBtn.addEventListener('click', undo);
   validateBtn.addEventListener('click', validate);
   hintBtn.addEventListener('click', showHint);
   rollBtn.addEventListener('click', newRound);
