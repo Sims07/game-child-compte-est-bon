@@ -21,7 +21,44 @@ Aucune installation : ouvrir le fichier `compte-est-bon.html` dans n'importe que
 - Aucune dépendance externe (hormis les polices Google Fonts, chargées via CDN)
 - Compatible ordinateur, tablette et mobile
 
+## 🖼️ Crédits image
+
+- Texture de parchemin : *Old Parchment Paper* par cron, [OpenGameArt.org](https://opengameart.org/content/old-parchment-paper), licence CC0 (domaine public, réutilisation libre).
+
 ## 📝 Changelog
+
+### v2.1.0
+- Suppression de la bannière château (qui ne s'affichait pas de façon fiable et gaspillait de l'espace) et de la rangée baguette/balai, pour libérer beaucoup de place verticale en thème Poudlard.
+- Une seule icône (le chapeau) reste en en-tête au lieu de deux.
+- Tailles de police encore réduites (titre, sous-titre, nombre magique) pour mieux tenir sur petit écran.
+- Correction de l'alignement des boutons (opérateurs, actions, bascule de thème) : tous centrent maintenant leur contenu de façon identique, ce qui supprime les décalages verticaux visibles entre les boutons.
+
+### v2.0.1
+- Correction du thème Poudlard : le titre et le nombre magique avaient une taille fixe qui ignorait l'optimisation mobile de la v2.0.0, provoquant un titre sur 3 lignes qui débordait sur iPhone. Les deux sont maintenant fluides comme le reste. Les bougies décoratives sont masquées sur petit écran pour épurer l'affichage.
+
+### v2.0.0
+- Optimisation des dimensions pour un affichage compatible iPhone (notamment dans un portail utilisant des iframes) : tailles de police et espacements désormais fluides (`clamp()`), réduction générale des marges/paddings (titre, plateau, bac à dés, boutons, bannière château), pour que l'ensemble du jeu tienne mieux sur un petit écran sans être coupé.
+
+### v1.9.4
+- Ajout d'une bannière "château magique" au-dessus du titre, en thème Poudlard uniquement (photo libre de droits, teintée pour s'harmoniser avec le parchemin, fondue en dégradé). Il s'agit d'un château fantastique générique, pas d'une reproduction du design officiel du château de la licence Harry Potter.
+
+### v1.9.3
+- Correction du bug d'affichage : la photo de parchemin était répétée en petites tuiles, créant de vilaines craquelures noires sur toute la page. Elle s'affiche maintenant en un seul grand fond (sans répétition).
+- Le fond en vrai parchemin est désormais réservé au thème Poudlard (le thème classique retrouve son fond simple d'origine).
+- Ajout d'un bord "parchemin déchiré" irrégulier sur le plateau et le bac à dés, et d'une police manuscrite (EB Garamond italique) pour le sous-titre, le libellé et le pied de page, pour un rendu plus proche d'un vieux grimoire.
+
+### v1.9.2
+- Remplacement de la texture de grain générée en SVG par une vraie photo de parchemin ancien (licence CC0, libre de droits), utilisée pour le fond du site ainsi que pour le bac à dés et les tuiles-nombres du thème Poudlard.
+
+### v1.9.1
+- Effet "vieux parchemin" du fond de page nettement renforcé : véritable grain de papier (généré en SVG), taches plus marquées et bords assombris, pour un rendu plus texturé qu'un simple dégradé.
+
+### v1.9.0
+- Fond de page transformé en vieux parchemin : taches, légère vignette sur les bords, texture de fibres de papier (sur les deux thèmes).
+- Ajout d'un petit son de succès (carillon généré en direct via Web Audio API, aucun fichier audio à héberger) qui se joue à chaque bonne réponse.
+
+### v1.8.0
+- Thème Poudlard enrichi avec 3 améliorations : texture parchemin sur le bac et les tuiles (bords irréguliers, légère rotation), ambiance de fond façon Grande Salle (bougies flottantes scintillantes + ciel étoilé animé), et une célébration de victoire dédiée (sablier qui se remplit de rubis + étincelles dorées) remplaçant le simple message de bravo.
 
 ### v1.7.0
 - Amélioration de la lisibilité des dés : dés et points agrandis, bordure contrastée autour de chaque dé, et en thème Poudlard un fond bordeaux foncé avec points dorés (au lieu de points clairs sur fond doré, peu lisibles).
